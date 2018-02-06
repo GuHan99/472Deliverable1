@@ -1,44 +1,38 @@
 import cmd
-from Tools import isValid
-from Tools import present
-import Box
+from Box import Box
 import re
 
-class CandyLoop(cmd.Cmd):
+class ReadFile(cmd.Cmd):
     prompt = 'Loop '
 
     @staticmethod
-    def do_manul(self):
+    def do_manual(self):
         # input_order = input('please type in the candy order in the box: ')
         # while not isValid(input_order):
         #     input_order = input('please type in the candy order in the box: ')
-        input_order = ''
+        input_order = []
         with open('./sample.txt', 'rt') as f:
             for line in f:
                 line = line.strip('\n')
                 c = line.split(' ')
-                for i in c:
-                    input_order += i + ' '
+                input_order.append(c)
 
         # present(input_order)
         on_going = True
-        box = Box.Box(input_order)
-        while on_going:
-            input_direction = input('type in the candy ')
-            while not re.match('[A-M]', input_direction):
-                input_direction = input('type in the candy')
-            else:
-                box = Box.Box()
 
+        for line in input_order:
+            box = Box(line)
 
-
+    @staticmethod
+    def do_auto(self):
+        print("To be implemented")
 
     @staticmethod
     def do_exit(self):
         return True
 
 if __name__ == '__main__':
-    CandyLoop().cmdloop()
+    ReadFile().cmdloop()
 
 
 
