@@ -1,10 +1,13 @@
 
 class Box:
-    def __init__(self):
-        self.order_list = []
+    def __init__(self, str):
+        self.order_list = str
 
-        order_list = []
-        empty_position = 0
+    order_list = ''
+    empty_position = 0
 
-    # def __translate(self, position):
-        
+    def test(self, str):
+        numOfEmpty = ord(str)-65
+
+
+
