@@ -1,3 +1,7 @@
 .idea/
 .__pycache__/
 *pyc
+Generator.py
+*.pyc
+
+output.txt
