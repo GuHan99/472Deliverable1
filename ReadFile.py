@@ -74,9 +74,6 @@ class ReadFile(cmd.Cmd):
 
 
 if __name__ == '__main__':
-    command = "python ./Generator.py"
-    process = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    code = process.wait()
     ReadFile().cmdloop()
 
 

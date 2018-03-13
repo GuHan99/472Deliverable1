@@ -5,3 +5,5 @@
 
 sample_level.txt
 output.txt
+
+*.pyc
