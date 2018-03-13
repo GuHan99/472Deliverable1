@@ -2,6 +2,7 @@ import random
 
 pattern = ['1 1', '2 1', '3 1', '4 1']
 
+
 def get_pattern(level):
     level_array = []
     if level is '1':

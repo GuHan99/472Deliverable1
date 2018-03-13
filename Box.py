@@ -19,6 +19,71 @@ move = {0: [1, 5],
 allowed = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o']
 
 
+class Pair:
+    def __init__(self, array, prev, pre_e):
+        self.ol = array
+        self.prev = prev
+        self.pre_e = pre_e
+
+
+def is_symmetric(array):
+    if not array:
+        return False
+    for i in range(5):
+        if array[i] != array[i + 10]:
+            return False
+    print("Congratulation")
+    return True
+
+
+# input is a current state array, return a allowed swapped states pair
+# this method works for auto run, not manual run
+def get_allowed_input(array):
+    index = array.index('e')
+    result =[]
+    for i in move[index]:
+        result.append(swap(array, i))
+    return result
+
+
+# input is a current state array, and a number for position to swap.
+# this method works for auto run, not manual run
+def swap(array, num):
+    result = list(array)
+    i = result.index('e')
+    j = num
+    temp = result[i]
+    result[i] = result[j]
+    result[j] = temp
+
+    result = Pair(result, num, i)
+    return result
+
+
+# input is a current state array, heuristic is num of symetric.
+def heuristic(array):
+    result = 0
+    for i in range(5):
+        if array[i] == array[i+10]:
+            result += 1
+    return result
+
+
+# to print out the table
+def print_table(array):
+    for i in range(15):
+        if i % 5 == 4:
+            if array[i] == 'e':
+                print('%')
+            else:
+                print(array[i])
+        else:
+            if array[i] == 'e':
+                print('% ' + " ", end='')
+            else:
+                print(array[i] + "  ", end='')
+
+
 class Box:
 
     def __init__(self, array):
@@ -27,27 +92,70 @@ class Box:
         self.start_time = time.time()
         self.end_time = 0
         self.out_order = []
+        self.is_init = True
 
     def manual_run(self):
-        self._locate_empty()
+        self._locate_empty('manual')
 
-    def _locate_empty(self):
-        for i in range(14):
-            if self.ol[i] == 'e':
-                self.empty_position = i
-                break
+    def auto_run(self):
+        self._locate_empty('auto')
+
+    def _locate_empty(self, mode):
+        self.empty_position = self.ol.index('e')
         if self.empty_position != -1:
-            self._start_game()
+            if mode == 'manual':
+                self._start_game()
+            elif mode == 'auto':
+                self._start_auto_game()
         else:
             print("There should be empty space in the input.")
             self.exit_game(False)
             self.end_time = time.time()
 
+    def _start_auto_game(self):
+        print('$$$$$$$$$$$$$$$$$$$$$$$$$$$$$')
+        init = Pair(self.ol, 100, 100)
+        openlist = [init]
+        closelist = []
+        openlist_ol= [init.ol]
+        closelist_ol=[]
+
+        while len(openlist) is not 0:
+            current_pair = openlist[0]
+            if is_symmetric(current_pair.ol):
+                break
+            else:
+                allowed_positions = get_allowed_input(current_pair.ol)
+                closelist.append(current_pair)
+                closelist_ol.append(current_pair.ol)
+                openlist.remove(current_pair)
+                openlist_ol.remove(current_pair.ol)
+                open_add = list(filter(lambda x: x.ol not in closelist_ol and x.ol not in openlist_ol, allowed_positions))
+                openlist += open_add
+                for i in open_add:
+                    openlist_ol.append(i.ol)
+                openlist.sort(key=lambda x: heuristic(x.ol), reverse=True)
+        print_table(openlist[0].ol)
+        solution_path = []
+        node = openlist[0]
+        while node.prev is not 100:
+            solution_path.append(node.prev)
+            back_state = swap(node.ol, node.pre_e)
+            for i in closelist:
+                if back_state.ol == i.ol:
+                    node = i
+        solution_path = solution_path[::-1]
+        result_path = []
+        for i in solution_path:
+            result_path.append(chr(i+97))
+        print(result_path)
+        print('xx')
+
     def _start_game(self):
         counter = 0
         self._print_table()
 
-        while not self._is_symmetric() and counter<50:
+        while not is_symmetric(self.ol) and counter<50:
             valid_input = False
             while not valid_input:
                 print("Enter the move : ( allowed input : ", self._print_allowed_input(), ")")
@@ -80,14 +188,6 @@ class Box:
         self.ol[i] = self.ol[j]
         self.ol[j] = temp
 
-    def _is_symmetric(self):
-        for i in range(5):
-            if self.ol[i] != self.ol[i+10]:
-                return False
-
-        print("Congratulation")
-        return True
-
     @staticmethod
     def exit_game(self, fault):
         if fault:
@@ -113,11 +213,8 @@ class Box:
         for i in self.out_order:
             string_o += chr(ord(i)-32)
         string_o += '\n'
-        time_cosume = self.end_time - self.start_time
-        time_cosume = str(int(time_cosume))
-        string_o += time_cosume
+        time_consume = self.end_time - self.start_time
+        time_consume = str(int(time_consume))
+        string_o += time_consume
         string_o += 'ms\n'
         return string_o
-
-
-

@@ -3,6 +3,7 @@ from Box import Box
 import time
 from Tools import output_file
 
+
 class ReadFile(cmd.Cmd):
     prompt = 'Loop '
 
@@ -13,7 +14,7 @@ class ReadFile(cmd.Cmd):
         #     input_order = input('please type in the candy order in the box: ')
         input_order = []
         start_time = time.time()
-        with open('./sample.txt', 'rt') as f:
+        with open('./sample_level.txt', 'rt') as f:
             for line in f:
                 line = line.strip('\n')
                 c = line.split(' ')
@@ -36,9 +37,19 @@ class ReadFile(cmd.Cmd):
         counter = str(counter)
         output_str += counter
         output_file(output_str)
+
     @staticmethod
     def do_auto(self):
-        print("To be implemented")
+        input_order = []
+        with open('./sample_level.txt', 'rt') as f:
+            for line in f:
+                line = line.strip('\n')
+                c = line.split(' ')
+                input_order.append(c)
+
+        for line in input_order:
+            box = Box(line)
+            box.auto_run()
 
     @staticmethod
     def do_exit(self):
