@@ -1,6 +1,7 @@
 import random
 
-pattern = ['1 1', '2 1', '3 1', '4 1']
+pattern = ['4 10']
+
 
 def get_pattern(level):
     level_array = []
@@ -36,7 +37,7 @@ for i in pattern:
         result = get_pattern(level=level)
         sample_result += result + '\n'
 
-with open('./sample_level.txt', 'w+') as f:
+with open('./input.txt', 'w+') as f:
     f.write(sample_result)
 
 
