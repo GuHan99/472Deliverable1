@@ -84,6 +84,51 @@ def print_table(array):
                 print(array[i] + "  ", end='')
 
 
+def visual_trace(array, path):
+    with open('./visual_output.txt', 'a+') as f:
+        f.write('%%%%%%%%%%%%%%%%%%%%%%%%%\n')
+        for i, v in enumerate(path):
+            array = list(map(lambda x: '%' if x is 'e' else x, array))
+            string = ''
+            for x in range(0, 4):
+                string += array[x]+' '
+            string += array[4]+'\n'
+            for x in range(5, 9):
+                string += array[x]+' '
+            string += array[9]+'\n'
+            for x in range(10, 14):
+                string += array[x]+' '
+            string += array[14]+'\n'
+            f.write(string)
+            f.write('%d step, %d move\n' % (i, v))
+
+            # this is to swap
+            result = list(array)
+            i = result.index('%')
+            j = v
+            temp = result[i]
+            result[i] = result[j]
+            result[j] = temp
+
+            array = result
+
+        string = ''
+        for x in range(0, 4):
+            string += array[x] + ' '
+        string += array[4] + '\n'
+        for x in range(5, 9):
+            string += array[x] + ' '
+        string += array[9] + '\n'
+        for x in range(10, 14):
+            string += array[x] + ' '
+        string += array[14] + '\n'
+        f.write(string)
+        f.write('$$$$$$$$$$$$$$$$$$$$$$$$$$\n\n')
+        f.close()
+
+
+
+
 class Box:
 
     def __init__(self, array):
@@ -92,7 +137,6 @@ class Box:
         self.start_time = time.time()
         self.end_time = 0
         self.out_order = []
-        self.is_init = True
 
     def manual_run(self):
         self._locate_empty('manual')
@@ -135,7 +179,7 @@ class Box:
                 for i in open_add:
                     openlist_ol.append(i.ol)
                 openlist.sort(key=lambda x: heuristic(x.ol), reverse=True)
-        print_table(openlist[0].ol)
+
         solution_path = []
         node = openlist[0]
         while node.prev is not 100:
@@ -148,7 +192,10 @@ class Box:
         result_path = []
         for i in solution_path:
             result_path.append(chr(i+97))
-        print(result_path)
+        self.out_order = result_path
+
+        visual_trace(self.ol, solution_path)
+        self.end_time = time.time()
         print('xx')
 
     def _start_game(self):
@@ -214,7 +261,7 @@ class Box:
             string_o += chr(ord(i)-32)
         string_o += '\n'
         time_consume = self.end_time - self.start_time
-        time_consume = str(int(time_consume))
+        time_consume = str(time_consume*1000.000)
         string_o += time_consume
         string_o += 'ms\n'
         return string_o
