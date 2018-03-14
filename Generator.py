@@ -1,6 +1,6 @@
 import random
 
-pattern = ['4 10']
+pattern = ['2 50']
 
 
 def get_pattern(level):

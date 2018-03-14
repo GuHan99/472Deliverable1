@@ -20,10 +20,10 @@ allowed = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n',
 
 
 class Pair:
-    def __init__(self, array, prev, pre_e):
+    def __init__(self, array, pre_e, gn):
         self.ol = array
-        self.prev = prev
         self.pre_e = pre_e
+        self.gn = gn
 
 
 def is_symmetric(array):
@@ -38,17 +38,17 @@ def is_symmetric(array):
 
 # input is a current state array, return a allowed swapped states pair
 # this method works for auto run, not manual run
-def get_allowed_input(array):
+def get_allowed_input(array, gn):
     index = array.index('e')
     result =[]
     for i in move[index]:
-        result.append(swap(array, i))
+        result.append(swap(array, i, gn))
     return result
 
 
 # input is a current state array, and a number for position to swap.
 # this method works for auto run, not manual run
-def swap(array, num):
+def swap(array, num, gn):
     result = list(array)
     i = result.index('e')
     j = num
@@ -56,16 +56,17 @@ def swap(array, num):
     result[i] = result[j]
     result[j] = temp
 
-    result = Pair(result, num, i)
+    result = Pair(result, i, gn+0.1)
     return result
 
 
 # input is a current state array, heuristic is num of symetric.
-def heuristic(array):
+def heuristic(array, gn):
     result = 0
     for i in range(5):
         if array[i] == array[i+10]:
             result += 1
+    result -= gn
     return result
 
 
@@ -127,8 +128,6 @@ def visual_trace(array, path):
         f.close()
 
 
-
-
 class Box:
 
     def __init__(self, array):
@@ -158,33 +157,37 @@ class Box:
 
     def _start_auto_game(self):
         print('$$$$$$$$$$$$$$$$$$$$$$$$$$$$$')
-        init = Pair(self.ol, 100, 100)
+        init = Pair(self.ol, 100, 0)
         openlist = [init]
         closelist = []
-        openlist_ol= [init.ol]
-        closelist_ol=[]
 
         while len(openlist) is not 0:
             current_pair = openlist[0]
             if is_symmetric(current_pair.ol):
                 break
             else:
-                allowed_positions = get_allowed_input(current_pair.ol)
+                allowed_positions = get_allowed_input(current_pair.ol, current_pair.gn)
                 closelist.append(current_pair)
-                closelist_ol.append(current_pair.ol)
+                close_ol = list(map(lambda x: x.ol, closelist))
                 openlist.remove(current_pair)
-                openlist_ol.remove(current_pair.ol)
-                open_add = list(filter(lambda x: x.ol not in closelist_ol and x.ol not in openlist_ol, allowed_positions))
+                open_ol = list(map(lambda x: x.ol, openlist))
+                open_add = list(filter(lambda x: x.ol not in close_ol and x.ol not in open_ol, allowed_positions))
                 openlist += open_add
-                for i in open_add:
-                    openlist_ol.append(i.ol)
-                openlist.sort(key=lambda x: heuristic(x.ol), reverse=True)
+                open_ol = list(map(lambda x: x.ol, openlist))
+                openlist.sort(key=lambda x: heuristic(x.ol, x.gn), reverse=True)
+            for i in current_pair.ol:
+                if i is 'e':
+                    print('#', end=' ')
+                else:
+                    print(i, end=' ')
+            print('\n')
 
         solution_path = []
         node = openlist[0]
-        while node.prev is not 100:
-            solution_path.append(node.prev)
-            back_state = swap(node.ol, node.pre_e)
+        while node.pre_e is not 100:
+            node_e = node.ol.index('e')
+            solution_path.append(node_e)
+            back_state = swap(node.ol, node.pre_e, 0)
             for i in closelist:
                 if back_state.ol == i.ol:
                     node = i
@@ -264,4 +267,5 @@ class Box:
         time_consume = str(time_consume*1000.000)
         string_o += time_consume
         string_o += 'ms\n'
+        print(string_o, end=' ')
         return string_o
