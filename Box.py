@@ -56,17 +56,16 @@ def swap(array, num, gn):
     result[i] = result[j]
     result[j] = temp
 
-    result = Pair(result, i, gn+0.1)
+    result = Pair(result, i, gn+1)
     return result
 
 
 # input is a current state array, heuristic is num of symetric.
 def heuristic(array, gn):
-    result = 0
+    result = 5
     for i in range(5):
         if array[i] == array[i+10]:
-            result += 1
-    result -= gn
+            result -= 1
     return result
 
 
@@ -136,6 +135,7 @@ class Box:
         self.start_time = time.time()
         self.end_time = 0
         self.out_order = []
+        self.time_out = False
 
     def manual_run(self):
         self._locate_empty('manual')
@@ -161,26 +161,40 @@ class Box:
         openlist = [init]
         closelist = []
 
-        while len(openlist) is not 0:
+        while len(openlist) is not 0 and not self.time_out:
             current_pair = openlist[0]
             if is_symmetric(current_pair.ol):
                 break
             else:
                 allowed_positions = get_allowed_input(current_pair.ol, current_pair.gn)
+
                 closelist.append(current_pair)
                 close_ol = list(map(lambda x: x.ol, closelist))
+
                 openlist.remove(current_pair)
                 open_ol = list(map(lambda x: x.ol, openlist))
+
+                # filter those in open-list but gn is less
+                for i in allowed_positions:
+                    if i.ol in open_ol:
+                        for x in openlist:
+                            if x.ol is i.ol and x.gn > i.gn:
+                                x.pre_e = i.pre_e
+                                x.gn = i.gn
                 open_add = list(filter(lambda x: x.ol not in close_ol and x.ol not in open_ol, allowed_positions))
+
                 openlist += open_add
                 open_ol = list(map(lambda x: x.ol, openlist))
-                openlist.sort(key=lambda x: heuristic(x.ol, x.gn), reverse=True)
-            for i in current_pair.ol:
-                if i is 'e':
-                    print('#', end=' ')
-                else:
-                    print(i, end=' ')
-            print('\n')
+
+                openlist.sort(key=lambda x: heuristic(x.ol, x.gn), reverse=False)
+            if time.time()-self.start_time >= 4:
+                self.time_out = True
+            # for i in current_pair.ol:
+            #     if i is 'e':
+            #         print('#', end=' ')
+            #     else:
+            #         print(i, end=' ')
+            # print('\n')
 
         solution_path = []
         node = openlist[0]
@@ -196,6 +210,9 @@ class Box:
         for i in solution_path:
             result_path.append(chr(i+97))
         self.out_order = result_path
+
+        if self.time_out:
+            self.out_order = []
 
         visual_trace(self.ol, solution_path)
         self.end_time = time.time()

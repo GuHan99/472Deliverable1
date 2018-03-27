@@ -46,8 +46,11 @@ class ReadFile(cmd.Cmd):
             box = Box(line)
             box.auto_run()
             output_str += box.output_string()
-            index+=1
-            print('%dth puzzle complete.' % index)
+            index += 1
+            if box.time_out:
+                print('%dth puzzle time-out.' % index)
+            else:
+                print('%dth puzzle complete.' % index)
         counter = 0
         flag_counter = 0
         for i in output_str.splitlines():
