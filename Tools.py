@@ -22,9 +22,22 @@ def empty(string):
         return string
 
 
-def output_file(string):
-    with open('./output.txt', 'w+') as f:
-        f.write(string)
+def output_file(string, level):
+    if level is 1:
+        with open('./output1.txt', 'w+') as f:
+            f.write(string)
+    elif level is 2:
+        with open('./output2.txt', 'w+') as f:
+            f.write(string)
+    elif level is 3:
+        with open('./output3.txt', 'w+') as f:
+            f.write(string)
+    elif level is 4:
+        with open('./output4.txt', 'w+') as f:
+            f.write(string)
+    elif level is 0:
+        with open('./output.txt', 'w+') as f:
+            f.write(string)
 
 
 

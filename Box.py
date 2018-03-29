@@ -1,5 +1,5 @@
 import time
-
+import math
 move = {0: [1, 5],
         1: [0, 2, 6],
         2: [1, 3, 7],
@@ -16,6 +16,7 @@ move = {0: [1, 5],
         13: [8, 12, 14],
         14: [9, 13]}
 
+heuristic_matrix = [[13, 11, 10, 8, 5, 0], [13, 11, 10, 9, 5, 0], [15, 13, 11, 9, 7, 0], [16, 14, 12, 10, 8, 0]]
 allowed = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o']
 
 
@@ -60,12 +61,62 @@ def swap(array, num, gn):
     return result
 
 
+def index_position(array, candy):
+    result = []
+    for i in range(0, 15):
+        if array[i] is candy:
+            result.append(i)
+    return result
+
+
 # input is a current state array, heuristic is num of symetric.
 def heuristic(array, gn):
-    result = 5
+    result = gn
+    count = 0
     for i in range(5):
-        if array[i] == array[i+10]:
-            result -= 1
+        if array[i] == array[i + 10]:
+            count += 1
+    level = len(set(array))-4
+    result += heuristic_matrix[level][count]
+    result -= count*10
+
+    if level is 4:
+        b_position = index_position(array, 'b')
+        w_position = index_position(array, 'w')
+        y_position = index_position(array, 'y')
+        g_position = index_position(array, 'g')
+        p_position = index_position(array, 'p')
+        if b_position[0]/5 == b_position[1]/5 and b_position[0]/5 != 1:
+            result += 5
+        if w_position[0] / 5 == w_position[1] / 5 and w_position[0] / 5 != 1:
+            result += 5
+        if y_position[0] / 5 == y_position[1] / 5 and y_position[0] / 5 != 1:
+            result += 5
+        if g_position[0] / 5 == g_position[1] / 5 and g_position[0] / 5 != 1:
+            result += 5
+        if p_position[0] / 5 == p_position[1] / 5 and p_position[0] / 5 != 1:
+            result += 5
+    elif level is 3:
+        w_position = index_position(array, 'w')
+        y_position = index_position(array, 'y')
+        g_position = index_position(array, 'g')
+        if w_position[0] / 5 == w_position[1] / 5 and w_position[0] / 5 != 1:
+            result += 5
+        if y_position[0] / 5 == y_position[1] / 5 and y_position[0] / 5 != 1:
+            result += 5
+        if g_position[0] / 5 == g_position[1] / 5 and g_position[0] / 5 != 1:
+            result += 5
+    elif level is 2:
+        w_position = index_position(array, 'w')
+        y_position = index_position(array, 'y')
+        if w_position[0] / 5 == w_position[1] / 5 and w_position[0] / 5 != 1:
+            result += 5
+        if y_position[0] / 5 == y_position[1] / 5 and y_position[0] / 5 != 1:
+            result += 5
+    elif level is 1:
+        w_position = index_position(array, 'w')
+        if w_position[0] / 5 == w_position[1] / 5 and w_position[0] / 5 != 1:
+            result += 5
     return result
 
 
@@ -187,6 +238,7 @@ class Box:
                 open_ol = list(map(lambda x: x.ol, openlist))
 
                 openlist.sort(key=lambda x: heuristic(x.ol, x.gn), reverse=False)
+
             if time.time()-self.start_time >= 4:
                 self.time_out = True
             # for i in current_pair.ol:
@@ -277,10 +329,14 @@ class Box:
 
     def output_string(self):
         string_o = ''
+        # string_o += str(len(self.out_order))
+        # string_o += '\tof length\n'
         for i in self.out_order:
             string_o += chr(ord(i)-32)
         string_o += '\n'
         time_consume = self.end_time - self.start_time
+        if self.time_out:
+            time_consume = 0
         time_consume = str(time_consume*1000.000)
         string_o += time_consume
         string_o += 'ms\n'
