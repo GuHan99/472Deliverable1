@@ -16,7 +16,7 @@ move = {0: [1, 5],
         13: [8, 12, 14],
         14: [9, 13]}
 
-heuristic_matrix = [[13, 11, 10, 8, 5, 0], [13, 11, 10, 9, 5, 0], [15, 13, 11, 9, 7, 0], [16, 14, 12, 10, 8, 0]]
+heuristic_matrix = [[13, 11, 10, 8, 5, 0], [15, 13, 10, 9, 5, 0], [15, 13, 11, 9, 7, 0], [16, 14, 12, 10, 8, 0]]
 allowed = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o']
 
 
@@ -78,7 +78,7 @@ def heuristic(array, gn):
             count += 1
     level = len(set(array))-4
     result += heuristic_matrix[level][count]
-    result -= count*10
+    result -= count*30
 
     if level is 4:
         b_position = index_position(array, 'b')
